@@ -1,16 +1,22 @@
 import json
+import os
 from PIL import Image, ImageDraw, ImageFont
 from PIL import ImageColor
 from io import BytesIO
 
 additional_colors = [colorname for (colorname, colorcode) in ImageColor.colormap.items()]
 
-def resize_img(img_path):
-    im = Image.open(BytesIO(open(img_path, "rb").read()))
+def resize_img(img):
+    if isinstance(img, (bytes,BytesIO)):
+        im = Image.open(BytesIO(img))
+    elif isinstance(img, str) and os.path.isfile(img):
+        im = Image.open(BytesIO(open(img, "rb").read()))
+    
     im = im.convert("RGB")
     im.thumbnail([1024,1024], Image.LANCZOS)
 
     return im
+
 
 def plot_bounding_boxes(im, bounding_boxes):
     """
