@@ -19,5 +19,5 @@ services:
     ports:
       - "8501:8501"
     depends_on:
-      -groundingdino
-      -gemini2
+      - groundingdino
+      - gemini2
