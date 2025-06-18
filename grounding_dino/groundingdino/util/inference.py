@@ -2,8 +2,10 @@ from typing import Tuple, List
 
 import cv2
 import numpy as np
+from io import BytesIO
 import supervision as sv
 import torch
+import os
 from PIL import Image
 from torchvision.ops import box_convert
 import bisect
@@ -36,7 +38,7 @@ def load_model(model_config_path: str, model_checkpoint_path: str, device: str =
     return model
 
 
-def load_image(image_path: str) -> Tuple[np.array, torch.Tensor]:
+def load_image(image_path) -> Tuple[np.array, torch.Tensor]:
     transform = T.Compose(
         [
             T.RandomResize([800], max_size=1333),
@@ -44,7 +46,11 @@ def load_image(image_path: str) -> Tuple[np.array, torch.Tensor]:
             T.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
         ]
     )
-    image_source = Image.open(image_path).convert("RGB")
+    if isinstance(image_path, (bytes,BytesIO)):
+        im = Image.open(BytesIO(image_path))
+    elif isinstance(image_path, str) and os.path.isfile(image_path):
+        im = Image.open(BytesIO(open(image_path, "rb").read()))
+    image_source = im.convert("RGB")
     image = np.asarray(image_source)
     image_transformed, _ = transform(image_source, None)
     return image, image_transformed
