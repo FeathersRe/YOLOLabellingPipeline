@@ -17,6 +17,11 @@ RUN apt-get -y update && apt-get install -y --no-install-recommends \
 
 WORKDIR /opt/program
 
+COPY requirements.txt .
+
+RUN pip install --upgrade pip && \
+    pip install -r requirements.txt
+
 RUN git clone https://github.com/IDEA-Research/GroundingDINO.git
 
 RUN mkdir weights && \
@@ -27,4 +32,6 @@ RUN mkdir weights && \
 # Optional: install extra packages GroundingDINO may need
 RUN cd GroundingDINO/ && python -m pip install .
 
-CMD ["python"]
+COPY . . 
+
+CMD [ "python3", "groudingdino_pipeline_api.py"]
