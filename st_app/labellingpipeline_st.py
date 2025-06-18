@@ -2,14 +2,27 @@ import os
 import tempfile
 import requests
 import streamlit as st
+from PIL import Image
+from io import BytesIO
 
 GROUNDING_DINO_URL = "http://groundingdino:8001/detect"
 GEMINI_URL = "http://gemini2:8002/detect"
 
+MODEL_LINKS = {
+    "GroundingDino":GROUNDING_DINO_URL,
+    "Gemini2":GEMINI_URL
+}
+
 def st_app():
-    st.set_page_config(page_title="Gemini 2.0 YOLO pipeline")
-    st.header("🖼️Gemini 2.0 spatial generation pipeline")
-    user_req = st.text_input("Enter your YOLO requests")
+    st.set_page_config(page_title="YOLO Labelling pipeline")
+    st.header("🖼️YOLO Labelling pipeline")
+    
+    option = st.selectbox(
+        "Select your labelling base model:",
+        ("Gemini2", "GroundingDino")
+    )
+
+    user_req = st.text_input("Enter your YOLO requests:")
     run = st.button("Generate")
 
     with st.sidebar:
@@ -30,15 +43,20 @@ def st_app():
         temp_file.write(uploads.getbuffer())
         image_path = temp_file.name
 
-        with open(image_path, "rb") as f:
-            files = {"image": (image_path, f, uploads.type)}
-            data = {"prompt": user_req}
-
         with st.spinner("Running..."):
-            plotted_img = requests.post(GEMINI_URL, files=files, data=data)
-        
+
+            with open(image_path, "rb") as f:
+                files = {"image": (image_path, f, uploads.type)}
+                data = {"prompt": user_req}
+                response = requests.post(MODEL_LINKS[option], files=files, data=data)
+
+            if response.status_code == 200:
+                plotted_img = Image.open(BytesIO(response.content))
+                st.image(plotted_img)
+            else:
+                st.error("Failed to get image from backend.")
+
         os.unlink(image_path)
-        st.image(plotted_img)
 
 if __name__ == "__main__":
     st_app()
