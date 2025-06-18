@@ -23,4 +23,4 @@ RUN pip install --upgrade pip && \
 COPY . .
 
 # Default command
-CMD [ "python3" ]
+CMD [ "python3", "gemini_pipeline_api.py"]
