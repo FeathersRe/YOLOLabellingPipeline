@@ -6,3 +6,6 @@
 
 #Environment files for gemini2.0
 /gemini2/.env
+
+#Environment files for st_app
+/st_app/.env

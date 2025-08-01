@@ -1,5 +1,6 @@
 import io
 import tempfile
+import requests
 from io import BytesIO
 from flask import Flask, request, send_file
 from langchain_client_backend import config_client, get_response
@@ -9,10 +10,16 @@ app = Flask(__name__)
 
 @app.route("/detect", methods=["POST"])
 def detect():
-    image_file = request.files["image"]
-    prompt = request.form["prompt"]
-    image_bytes = image_file.read()
+    image_url = request.form.get("image_url")
+    prompt = request.form.get("prompt")
 
+    try:
+        response = requests.get(image_url)
+        response.raise_for_status()
+        image_bytes = response.content
+    except:
+        return "Error: Failed to download image!"
+    
     im = resize_img(image_bytes)
     
     llm_client = config_client()
