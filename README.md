@@ -8,6 +8,7 @@ Gemini 2.0 and Grounding Dino both show outstanding performance in object detect
 * Docker Compose
 * GroundingDino ([*groundingdino_swint_ogc.pth*](https://github.com/IDEA-Research/GroundingDINO/releases/download/v0.1.0-alpha/groundingdino_swint_ogc.pth))
 * LangChain
+* minIO
 
 ## Set-up
 1. Load pretrain weights and api-keys to the repository.
